@@ -5,13 +5,13 @@ export type TestUser = { id: string; name: string; email: string };
 const USER_KEY = 'arcus_test_user';
 const USERS_KEY = 'arcus_test_users';
 
+export function testAuthEnabled() {
+  return process.env.NEXT_PUBLIC_AUTH_MODE !== 'firebase';
+}
+
 function readUsers(): Array<TestUser & { password: string }> {
   if (typeof window === 'undefined') return [];
   try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch { return []; }
-}
-
-export function testAuthEnabled() {
-  return process.env.NEXT_PUBLIC_AUTH_MODE !== 'firebase';
 }
 
 export function getTestUser(): TestUser | null {
@@ -34,6 +34,12 @@ export function signInTestUser(email: string, password: string): TestUser {
   const user = readUsers().find(item => item.email === email.trim().toLowerCase() && item.password === password);
   if (!user) throw new Error('Invalid test email or password. Create a test account first.');
   const session = { id: user.id, name: user.name, email: user.email };
+  localStorage.setItem(USER_KEY, JSON.stringify(session));
+  return session;
+}
+
+export function signInTestGoogle(): TestUser {
+  const session = { id: 'google_test', name: 'Google Test User', email: 'google-test@arcus.local' };
   localStorage.setItem(USER_KEY, JSON.stringify(session));
   return session;
 }
