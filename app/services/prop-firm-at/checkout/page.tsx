@@ -1,0 +1,15 @@
+import Link from 'next/link';
+import { ArrowRight, CreditCard, ShieldCheck } from 'lucide-react';
+import CustomerMenu from '../../../../components/CustomerMenu';
+
+export default async function PropFirmCheckoutPage({ searchParams }: { searchParams: Promise<{ challenge?: string; account?: string; fee?: string }> }) {
+  const params = await searchParams;
+  const challenge = params.challenge || 'selected service';
+  const account = params.account || 'Selected account size';
+  const fee = params.fee || 'Contact sales';
+
+  return <main className="min-h-screen bg-[#f7f9f8] text-[#101512]">
+    <header className="sticky top-0 z-40 border-b border-[#e4e9e6] bg-white/95 backdrop-blur-xl"><div className="mx-auto flex min-h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10"><Link href="/dashboard" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#087f3f] text-sm font-black text-white">A</span><span><strong className="block text-[15px] tracking-[.16em]">ARCUS</strong><small className="block text-[8px] font-black tracking-[.35em] text-[#087f3f]">STRATEGY</small></span></Link><CustomerMenu /></div></header>
+    <section className="mx-auto max-w-[900px] px-5 py-12 sm:px-8 lg:py-16"><span className="text-[10px] font-black tracking-[.2em] text-[#087f3f]">PROP FIRM A.T · CHECKOUT</span><h1 className="mt-3 text-4xl font-black tracking-[-.045em] sm:text-5xl">Review your service request.</h1><div className="mt-8 rounded-3xl border border-[#dfe7e2] bg-white p-7 shadow-sm sm:p-9"><div className="grid gap-5 sm:grid-cols-3"><div><span className="text-[9px] font-black uppercase tracking-wider text-[#9aa39f]">Service</span><p className="mt-2 text-sm font-black capitalize">{challenge.replace('-', ' ')}</p></div><div><span className="text-[9px] font-black uppercase tracking-wider text-[#9aa39f]">Account Size</span><p className="mt-2 text-sm font-black">{account}</p></div><div><span className="text-[9px] font-black uppercase tracking-wider text-[#9aa39f]">Service Fee</span><p className="mt-2 text-xl font-black">{fee}</p></div></div><div className="mt-8 flex gap-3 rounded-2xl bg-[#f7f9f8] p-4"><ShieldCheck className="mt-0.5 shrink-0 text-[#087f3f]" size={19}/><p className="text-[12px] leading-6 text-[#68726e]">Payment processing is the next stage. Account credentials are not requested on this checkout screen. They are collected separately after successful payment.</p></div><Link href={`/services/prop-firm-at/account-submission?challenge=${encodeURIComponent(challenge)}&account=${encodeURIComponent(account)}&fee=${encodeURIComponent(fee)}&payment=successful`} className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f3f] px-5 py-3.5 text-[12px] font-black text-white">Continue after successful payment <CreditCard size={16}/><ArrowRight size={15}/></Link><p className="mt-3 text-center text-[10px] text-[#9aa39f]">Payment gateway integration will be connected to the production checkout backend.</p></div></section>
+  </main>;
+}
