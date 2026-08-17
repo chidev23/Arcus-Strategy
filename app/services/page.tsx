@@ -12,7 +12,7 @@ const services: Service[] = [
   { title: 'ServerLess Algotrading', description: 'Deploy an Arcus algorithm and optional hosted execution environment without maintaining a local trading workstation.', href: '/services/serverless-algotrading', number: '05', Icon: Server },
   { title: 'TradingView Indicator', description: 'TradingView-based technical analysis technology designed for structured market decision support.', href: '/services/tradingview-indicator', number: '06', Icon: ChartNoAxesCombined },
   { title: 'TradingView Strategy', description: 'Strategy automation workflows built around TradingView alerts and supported execution integrations.', href: '/services/tradingview-strategy', number: '07', Icon: Waypoints },
-  { title: 'Pine Bridge', description: 'Send trades from your TradingView setup to supported MT4, MT5 and cTrader execution environments.', href: '/services/pine-bridge', number: '08', Icon: Cable },
+  { title: 'Pine Bridge', description: 'Send trades from your TradingView setup to supported MT4, MT5 and cTrader execution environments.', href: '/services/pinebridge', number: '08', Icon: Cable },
   { title: 'Retail Tradar', description: 'Retail-focused trading technology for systematic execution, automation and structured workflows.', href: '/services/retail-tradar', number: '09', Icon: BarChart3 },
   { title: 'PropFirm Assisted Trading (Prop AT)', description: 'Professional assisted account trading for selected prop firm challenges and funded accounts, structured around applicable trading rules.', href: '/services/prop-firm-at', number: '10', Icon: Gauge },
 ];
