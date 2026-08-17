@@ -8,7 +8,7 @@ const products = [
   ['Prop Firm A.T', 'Automated trading technology for eligible prop-firm workflows.', Gauge, null],
   ['ServerLess Algotrading', 'Automation infrastructure designed without a local workstation.', Server, null],
   ['TradingView Indicator', 'TradingView analysis and signal technology.', Waypoints, '/products/tradingview-indicator'],
-  ['TradingView Strategy', 'TradingView strategy automation and execution workflows.', Bot, null],
+  ['TradingView Strategy', 'TradingView strategy automation and execution workflows.', Bot, '/products/tradingview-strategy'],
   ['TradingView Bridge', 'Webhook connectivity for supported automated execution workflows.', ArrowRight, null],
   ['Retail Tradar', 'Retail-focused systematic trading technology.', BarChart3, null],
 ] as const;
