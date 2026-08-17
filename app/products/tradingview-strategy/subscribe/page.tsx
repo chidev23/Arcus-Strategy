@@ -1,0 +1,18 @@
+import Link from 'next/link';
+import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck } from 'lucide-react';
+import { getTradingViewPlatform, tradingViewPlatforms } from '@/lib/tradingview-strategy';
+
+export default async function TradingViewStrategySubscriptionPage({ searchParams }: { searchParams: Promise<{ platform?: string }> }) {
+  const { platform: slug = 'zignaly' } = await searchParams;
+  const platform = getTradingViewPlatform(slug) ?? tradingViewPlatforms[0];
+
+  return (
+    <main className="min-h-screen bg-[#f7f9f8] text-[#101512]">
+      <header className="border-b border-[#e4e9e6] bg-white"><div className="mx-auto flex min-h-[74px] max-w-[1100px] items-center justify-between px-5 sm:px-8 lg:px-10"><Link href={`/products/tradingview-strategy/${platform.slug}`} className="inline-flex items-center gap-2 text-[12px] font-bold text-[#087f3f]"><ArrowLeft size={15}/> {platform.name} setup</Link><span className="text-[9px] font-black tracking-[.18em] text-[#9aa39f]">ARCUS SUBSCRIPTION</span></div></header>
+      <section className="mx-auto max-w-[1000px] px-5 py-14 sm:px-8 lg:px-10 lg:py-20"><div className="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div><span className="text-[10px] font-black tracking-[.2em] text-[#087f3f]">STEP 1 OF 3</span><h1 className="mt-3 text-4xl font-black tracking-[-.045em] sm:text-5xl">Subscribe to Arcus Strategy.</h1><p className="mt-5 max-w-2xl text-[14px] leading-7 text-[#68726e]">You are preparing the {platform.name} integration. Keep your subscription and onboarding inside the Arcus Strategy ecosystem before any external platform connection.</p><div className="mt-8 space-y-3">{['Access to the selected TradingView automation workflow','Guided webhook/API configuration','Platform-specific setup instructions','Support throughout onboarding'].map((item) => <div key={item} className="flex gap-3 rounded-xl border border-[#dfe7e2] bg-white p-4"><Check size={16} className="mt-0.5 shrink-0 text-[#087f3f]"/><span className="text-[12px] font-bold">{item}</span></div>)}</div></div>
+        <div className="rounded-3xl border border-[#dfe7e2] bg-white p-6 shadow-sm sm:p-8"><span className="grid h-11 w-11 place-items-center rounded-xl bg-[#edf8f1] text-[#087f3f]"><CreditCard size={18}/></span><h2 className="mt-5 text-xl font-black">{platform.name} integration</h2><p className="mt-2 text-[12px] leading-6 text-[#68726e]">Arcus Strategy subscription and onboarding for your selected automation platform.</p><div className="mt-7 rounded-2xl bg-[#f3f7f4] p-5"><div className="flex items-center justify-between"><span className="text-[12px] font-bold">Subscription</span><span className="text-[10px] font-black uppercase tracking-wider text-[#087f3f]">Secure checkout</span></div><p className="mt-2 text-[11px] leading-5 text-[#68726e]">Connect the live payment provider when billing is enabled.</p></div><Link href={`/products/tradingview-strategy/setup?platform=${platform.slug}`} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f3f] px-5 py-4 text-[12px] font-black text-white">Continue to setup confirmation <ArrowRight size={15}/></Link><p className="mt-4 text-center text-[10px] leading-5 text-[#9aa39f]">Payment integration is prepared as the next application layer. This screen does not claim a payment has been completed.</p></div>
+      </div><div className="mt-8 rounded-2xl border border-[#ead9dc] bg-[#fff8f8] p-5"><div className="flex gap-3"><ShieldCheck size={17} className="mt-0.5 shrink-0 text-[#c93642]"/><p className="text-[11px] leading-6 text-[#68726e]">Trading and automated execution involve risk. Subscription access does not guarantee profitability or execution results.</p></div></div></section>
+    </main>
+  );
+}
