@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft, Hash, MessageCircle, Send, Users } from 'lucide-react';
 import CustomerMenu from '../../../components/CustomerMenu';
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 const rooms: Record<string, { title: string; short: string; description: string }> = {
   'copy-trading': { title: 'Copy Trading Community', short: 'COPY TRADING', description: 'Discuss Arcus copy trading, onboarding, broker experiences and general community topics.' },
@@ -18,19 +18,12 @@ type CommunityPageProps = {
 };
 
 export default function CommunityRoom({ params }: CommunityPageProps) {
+  const { community } = use(params);
+  const room = rooms[community] ?? rooms['copy-trading'];
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
-    { name: 'Arcus Strategy', text: 'Welcome to the community. This is the dedicated discussion space for this service.', time: 'Now' },
+    { name: 'Arcus Strategy', text: `Welcome to the ${room.title}. This is the dedicated discussion space for this service.`, time: 'Now' },
   ]);
-  const [communityKey, setCommunityKey] = useState('copy-trading');
-
-  // Next.js 15 supplies dynamic route params as a Promise. Resolve them on the client.
-  // The fallback keeps the UI stable while the route parameter is being resolved.
-  void params.then(({ community }) => {
-    if (community && rooms[community]) setCommunityKey(community);
-  });
-
-  const room = rooms[communityKey] ?? rooms['copy-trading'];
 
   const send = () => {
     const text = message.trim();
