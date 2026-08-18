@@ -1,4 +1,65 @@
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Layers3, ShieldAlert, WalletCards } from 'lucide-react';
-const categories=[{title:'Copy Trading',href:'/risk-analysis/copy-trading',stats:'/performance-statistics/copy-trading',icon:BarChart3,description:'Review risk across MT4, MT5, Deriv Synthetic and cTrader copy-trading environments.'},{title:'PAMM',href:'/risk-analysis/pamm',stats:'/performance-statistics/pamm',icon:WalletCards,description:'Review PAMM risk by MT4, MT5 and broker account.'},{title:'MAM',href:'/risk-analysis/mam',stats:'/performance-statistics/mam',icon:Layers3,description:'Review MAM risk by MT4, MT5 and broker account.'}];
-export default function RiskAnalysisPage(){return <main className="min-h-screen bg-[#f7f9f8] text-[#101512]"><header className="border-b border-[#e4e9e6] bg-white"><div className="mx-auto flex min-h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10"><Link href="/" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#087f3f] text-sm font-black text-white">A</span><span><strong className="block text-[15px] tracking-[.16em]">ARCUS</strong><small className="block text-[8px] font-black tracking-[.35em] text-[#087f3f]">STRATEGY</small></span></Link><Link href="/dashboard" className="text-[10px] font-black text-[#68726e]">Customer Home</Link></div></header><section className="border-b border-[#e4e9e6] bg-white"><div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-10 lg:py-16"><span className="text-[10px] font-black tracking-[.2em] text-[#c93642]">RISK ANALYSIS</span><h1 className="mt-3 max-w-4xl text-4xl font-black tracking-[-.045em] sm:text-5xl">Understand the Risk Before You Invest.</h1><p className="mt-5 max-w-3xl text-[14px] leading-7 text-[#68726e]">Access detailed risk metrics, performance statistics and strategy behaviour analysis before subscribing to any Arcus Strategy service. Select a service to review its exact platform and broker environments.</p></div></section><section className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14"><div className="grid gap-5 lg:grid-cols-3">{categories.map(({title,href,stats,icon:Icon,description})=><div key={title} className="rounded-2xl border border-[#dfe7e2] bg-white p-7 shadow-sm"><span className="grid h-12 w-12 place-items-center rounded-xl bg-[#fff1f2] text-[#c93642]"><Icon size={20}/></span><h2 className="mt-7 text-xl font-black">{title}</h2><p className="mt-3 text-[13px] leading-6 text-[#68726e]">{description}</p><div className="mt-7 flex flex-wrap gap-2"><Link href={href} className="inline-flex items-center gap-2 rounded-xl bg-[#c93642] px-4 py-2.5 text-[11px] font-black text-white">Risk analysis <ArrowRight size={14}/></Link><Link href={stats} className="inline-flex items-center gap-2 rounded-xl border border-[#dfe7e2] px-4 py-2.5 text-[11px] font-black text-[#087f3f]"><BarChart3 size={14}/> Performance statistics</Link></div></div>)}</div></section></main>}
+import { ArrowRight, BarChart3, Layers3, WalletCards } from 'lucide-react';
+
+const categories = [
+  { title: 'Copy Trading', href: '/risk-analysis/copy-trading', icon: BarChart3, description: 'Review risk across MT4, MT5, Deriv Synthetic and cTrader copy-trading environments.' },
+  { title: 'PAMM', href: '/risk-analysis/pamm', icon: WalletCards, description: 'Review PAMM risk by MT4, MT5 and broker account.' },
+  { title: 'MAM', href: '/risk-analysis/mam', icon: Layers3, description: 'Review MAM risk by MT4, MT5 and broker account.' },
+];
+
+type RiskAnalysisPageProps = {
+  searchParams?: Promise<{ from?: string }>;
+};
+
+export default async function RiskAnalysisPage({ searchParams }: RiskAnalysisPageProps) {
+  const params = searchParams ? await searchParams : {};
+  const fromWelcome = params.from === 'welcome';
+
+  return (
+    <main className="min-h-screen bg-[#f7f9f8] text-[#101512]">
+      <header className="border-b border-[#e4e9e6] bg-white">
+        <div className="mx-auto flex min-h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#087f3f] text-sm font-black text-white">A</span>
+            <span>
+              <strong className="block text-[15px] tracking-[.16em]">ARCUS</strong>
+              <small className="block text-[8px] font-black tracking-[.35em] text-[#087f3f]">STRATEGY</small>
+            </span>
+          </Link>
+          {!fromWelcome && (
+            <Link href="/dashboard" className="text-[10px] font-black text-[#68726e]">Customer Home</Link>
+          )}
+        </div>
+      </header>
+
+      <section className="border-b border-[#e4e9e6] bg-white">
+        <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-10 lg:py-16">
+          <span className="text-[10px] font-black tracking-[.2em] text-[#c93642]">RISK ANALYSIS</span>
+          <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-[-.045em] sm:text-5xl">Understand the Risk Before You Invest.</h1>
+          <p className="mt-5 max-w-3xl text-[14px] leading-7 text-[#68726e]">
+            Access detailed risk metrics, performance statistics and strategy behaviour analysis before subscribing to any Arcus Strategy service. Select a service to review its exact platform and broker environments.
+          </p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+        <div className="grid gap-5 lg:grid-cols-3">
+          {categories.map(({ title, href, icon: Icon, description }) => (
+            <Link
+              key={title}
+              href={href}
+              className="group rounded-2xl border border-[#dfe7e2] bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+            >
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#fff1f2] text-[#c93642]"><Icon size={20} /></span>
+              <h2 className="mt-7 text-xl font-black">{title}</h2>
+              <p className="mt-3 text-[13px] leading-6 text-[#68726e]">{description}</p>
+              <span className="mt-7 inline-flex items-center gap-2 text-[11px] font-black text-[#c93642]">
+                Open risk analysis <ArrowRight size={14} />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
