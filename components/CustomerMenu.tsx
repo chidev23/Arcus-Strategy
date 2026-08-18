@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { BadgeCheck, CircleUserRound, Headphones, Home, Landmark, Menu, Network, ShieldCheck, X } from 'lucide-react';
+import { BadgeCheck, CircleUserRound, Headphones, Home, Landmark, Menu, Network, ShieldCheck, Star, X } from 'lucide-react';
 import { useState } from 'react';
 
 const links = [
   { href: '/dashboard', title: 'Home', description: 'Your Arcus customer workspace', icon: Home },
   { href: '/services', title: 'Services', description: 'Explore Arcus services', icon: Network },
   { href: '/community', title: 'Community Hub', description: 'Arcus community and updates', icon: Landmark },
+  { href: '/reviews', title: 'Reviews & Ratings', description: 'Read and share customer reviews', icon: Star },
   { href: '/verify', title: 'Verify Centre', description: 'Verify official Arcus information', icon: BadgeCheck },
   { href: '/profile', title: 'Profile Centre', description: 'Manage your customer profile', icon: CircleUserRound },
   { href: '/private-real-trading', title: 'Private Real Trading', description: 'View Arcus private real accounts', icon: ShieldCheck },
