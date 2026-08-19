@@ -1,0 +1,66 @@
+name: Fix legal page syntax
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-legal:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Escape apostrophes inside legal body strings
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('app/legal/[slug]/page.tsx')
+          text = path.read_text(encoding='utf-8')
+          lines = text.splitlines(keepends=True)
+          out = []
+          changed = False
+
+          for line in lines:
+              if "body:'" in line:
+                  m = re.search(r"body:'(.*)'([,}])(?:\r?\n)?$", line)
+                  if m:
+                      body = m.group(1)
+                      # Body strings are single-quoted TypeScript strings.
+                      # Replace literal apostrophes inside the body with a
+                      # typographic apostrophe so they cannot terminate the string.
+                      safe = body.replace("'", "’")
+                      newline = '\n' if line.endswith('\n') else ''
+                      new_line = line[:m.start(1)] + safe + line[m.end(1)-1:m.end(1)] + newline
+                      # Preserve the original suffix after the closing quote.
+                      suffix = line[m.end(1):]
+                      new_line = line[:m.start(1)] + safe + line[m.start(1)+len(body):]
+                      if new_line != line:
+                          changed = True
+                          line = new_line
+              out.append(line)
+
+          new_text = ''.join(out)
+          if changed and new_text != text:
+              path.write_text(new_text, encoding='utf-8')
+          PY
+
+      - name: Commit legal syntax fix
+        run: |
+          if git diff --quiet -- app/legal/'[slug]'/page.tsx; then
+            echo "No legal syntax changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/legal/'[slug]'/page.tsx
+          git commit -m "Fix legal page string syntax"
+          git push
