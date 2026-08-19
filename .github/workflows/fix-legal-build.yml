@@ -1,0 +1,58 @@
+name: Fix legal document syntax
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Normalize legal body strings
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('app/legal/[slug]/page.tsx')
+          text = path.read_text(encoding='utf-8')
+          lines = text.splitlines(keepends=True)
+          changed = False
+          out = []
+          for line in lines:
+              if "body:'" in line:
+                  line = line.replace("body:'", 'body:"', 1)
+                  if line.rstrip().endswith("'},"):
+                      line = line.rstrip()[:-3] + '"},' + ('\n' if line.endswith('\n') else '')
+                  elif line.rstrip().endswith("'}"):
+                      line = line.rstrip()[:-2] + '"}' + ('\n' if line.endswith('\n') else '')
+                  changed = True
+              out.append(line)
+          path.write_text(''.join(out), encoding='utf-8')
+          print('Changed:', changed)
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify production build
+        run: npm run build
+
+      - name: Commit verified fix and remove temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/fix-legal-build.yml
+          git add 'app/legal/[slug]/page.tsx'
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'fix: normalize legal document body strings'
+          git push origin main
