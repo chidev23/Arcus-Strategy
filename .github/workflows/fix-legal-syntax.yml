@@ -1,6 +1,7 @@
 name: Fix legal page syntax
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
 
@@ -17,40 +18,48 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Escape apostrophes inside legal body strings
+      - name: Fix the two known single-quoted legal strings
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
           path = Path('app/legal/[slug]/page.tsx')
           text = path.read_text(encoding='utf-8')
-          lines = text.splitlines(keepends=True)
-          out = []
-          changed = False
-          for line in lines:
-              if "body:'" in line:
-                  m = re.search(r"body:'(.*)'([,}])(?:\r?\n)?$", line)
-                  if m:
-                      body = m.group(1)
-                      safe = body.replace("'", "’")
-                      new_line = line[:m.start(1)] + safe + line[m.start(1)+len(body):]
-                      if new_line != line:
-                          changed = True
-                          line = new_line
-              out.append(line)
-          new_text = ''.join(out)
-          if changed and new_text != text:
-              path.write_text(new_text, encoding='utf-8')
+          old1 = "{heading:'4. Synthetic index risk',body:'Synthetic indices and similar derivative products are generated or quoted by their respective providers and can behave differently from traditional markets. Users must understand the provider's methodology, trading hours, volatility and contract rules before trading.'},"
+          new1 = "{heading:'4. Synthetic index risk', body:\"Synthetic indices and similar derivative products are generated or quoted by their respective providers and can behave differently from traditional markets. Users must understand the provider's methodology, trading hours, volatility and contract rules before trading.\"},"
+          old2 = "{heading:'6. MAM and PAMM risk',body:'Allocation structures may concentrate exposure across multiple positions or investors. Different allocation methods, fees, execution conditions and withdrawal constraints can affect outcomes. A manager's historical record is not a forecast.'},"
+          new2 = "{heading:'6. MAM and PAMM risk', body:\"Allocation structures may concentrate exposure across multiple positions or investors. Different allocation methods, fees, execution conditions and withdrawal constraints can affect outcomes. A manager's historical record is not a forecast.\"},"
+          new_text = text.replace(old1, new1).replace(old2, new2)
+          if new_text == text:
+              print('Exact strings were not found; checking targeted risk lines.')
+              lines = text.splitlines(keepends=True)
+              changed = False
+              for i, line in enumerate(lines):
+                  if "{heading:'4. Synthetic index risk'" in line:
+                      lines[i] = new1 + ('\n' if line.endswith('\n') else '')
+                      changed = True
+                  elif "{heading:'6. MAM and PAMM risk'" in line:
+                      lines[i] = new2 + ('\n' if line.endswith('\n') else '')
+                      changed = True
+              new_text = ''.join(lines)
+              if not changed:
+                  raise SystemExit('Target legal risk lines were not found.')
+          path.write_text(new_text, encoding='utf-8')
           PY
 
-      - name: Commit legal syntax fix
+      - name: Verify the fixed syntax
+        run: |
+          grep -n "4. Synthetic index risk\|6. MAM and PAMM risk" app/legal/'[slug]'/page.tsx
+          test "$(grep -n "4. Synthetic index risk" app/legal/'[slug]'/page.tsx | grep -c 'body:\"')" -eq 1
+          test "$(grep -n "6. MAM and PAMM risk" app/legal/'[slug]'/page.tsx | grep -c 'body:\"')" -eq 1
+
+      - name: Commit and push
         run: |
           if git diff --quiet -- app/legal/'[slug]'/page.tsx; then
-            echo "No legal syntax changes required."
+            echo "No changes required."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add app/legal/'[slug]'/page.tsx
-          git commit -m "Fix legal page string syntax"
+          git commit -m "Fix legal risk disclosure quote syntax"
           git push
