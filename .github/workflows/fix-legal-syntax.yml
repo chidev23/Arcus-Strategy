@@ -18,7 +18,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Convert every legal body string to double quotes
+      - name: Convert all legal body strings safely
+        shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -26,52 +27,46 @@ jobs:
 
           path = Path('app/legal/[slug]/page.tsx')
           text = path.read_text(encoding='utf-8')
-          lines = text.splitlines(keepends=True)
-          out = []
-          changed = False
 
-          # Every body value in this file is a single-line string. Convert
-          # body:'...' to body:"..." so apostrophes cannot terminate it.
-          pattern = re.compile(r"body:'(.*)'([,}])(?=\s*$)")
+          # Each legal body is a single-line value ending immediately before
+          # the comma/closing brace. Capture the complete value greedily so
+          # apostrophes such as strategy's, user's, don't, etc. are preserved.
+          pattern = re.compile(r"body:'(.*)'(?=,\s*$)", re.MULTILINE)
 
-          for line in lines:
-              match = pattern.search(line)
-              if not match:
-                  out.append(line)
-                  continue
-
+          def convert(match):
               body = match.group(1)
-              terminator = match.group(2)
-              # Escape any literal double quotes before switching delimiters.
+              # Convert the delimiter to double quotes and escape literal
+              # double quotes that may already occur in the legal text.
               body = body.replace('\\"', '"').replace('"', '\\"')
-              replacement = f'body:"{body}"{terminator}'
-              line = line[:match.start()] + replacement + line[match.end():]
-              changed = True
-              out.append(line)
+              return 'body:"' + body + '"'
 
-          new_text = ''.join(out)
-          if changed:
-              path.write_text(new_text, encoding='utf-8')
-          else:
-              print('No single-quoted body values remain to convert.')
+          new_text, count = pattern.subn(convert, text)
+          print(f'Converted {count} single-quoted body values.')
+          path.write_text(new_text, encoding='utf-8')
           PY
 
-      - name: Verify no single-quoted body values remain
+      - name: Verify legal body strings
         run: |
           if grep -nE "body:'" app/legal/'[slug]'/page.tsx; then
-            echo "ERROR: A single-quoted body value remains."
+            echo "ERROR: single-quoted legal body values remain."
             exit 1
           fi
-          echo "All legal body values use double quotes."
+          echo "PASS: all legal body values use double quotes."
 
-      - name: Commit and push
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run production build before committing
+        run: npm run build
+
+      - name: Commit and push verified fix
         run: |
           if git diff --quiet -- app/legal/'[slug]'/page.tsx; then
-            echo "No changes required."
+            echo "No legal source changes required."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add app/legal/'[slug]'/page.tsx
-          git commit -m "Convert all legal body strings to double quotes"
+          git commit -m "Fix legal page string syntax"
           git push
