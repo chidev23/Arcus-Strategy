@@ -18,39 +18,51 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fix the two known single-quoted legal strings
+      - name: Convert every legal body string to double quotes
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
+
           path = Path('app/legal/[slug]/page.tsx')
           text = path.read_text(encoding='utf-8')
-          old1 = "{heading:'4. Synthetic index risk',body:'Synthetic indices and similar derivative products are generated or quoted by their respective providers and can behave differently from traditional markets. Users must understand the provider's methodology, trading hours, volatility and contract rules before trading.'},"
-          new1 = "{heading:'4. Synthetic index risk', body:\"Synthetic indices and similar derivative products are generated or quoted by their respective providers and can behave differently from traditional markets. Users must understand the provider's methodology, trading hours, volatility and contract rules before trading.\"},"
-          old2 = "{heading:'6. MAM and PAMM risk',body:'Allocation structures may concentrate exposure across multiple positions or investors. Different allocation methods, fees, execution conditions and withdrawal constraints can affect outcomes. A manager's historical record is not a forecast.'},"
-          new2 = "{heading:'6. MAM and PAMM risk', body:\"Allocation structures may concentrate exposure across multiple positions or investors. Different allocation methods, fees, execution conditions and withdrawal constraints can affect outcomes. A manager's historical record is not a forecast.\"},"
-          new_text = text.replace(old1, new1).replace(old2, new2)
-          if new_text == text:
-              print('Exact strings were not found; checking targeted risk lines.')
-              lines = text.splitlines(keepends=True)
-              changed = False
-              for i, line in enumerate(lines):
-                  if "{heading:'4. Synthetic index risk'" in line:
-                      lines[i] = new1 + ('\n' if line.endswith('\n') else '')
-                      changed = True
-                  elif "{heading:'6. MAM and PAMM risk'" in line:
-                      lines[i] = new2 + ('\n' if line.endswith('\n') else '')
-                      changed = True
-              new_text = ''.join(lines)
-              if not changed:
-                  raise SystemExit('Target legal risk lines were not found.')
-          path.write_text(new_text, encoding='utf-8')
+          lines = text.splitlines(keepends=True)
+          out = []
+          changed = False
+
+          # Every body value in this file is a single-line string. Convert
+          # body:'...' to body:"..." so apostrophes cannot terminate it.
+          pattern = re.compile(r"body:'(.*)'([,}])(?=\s*$)")
+
+          for line in lines:
+              match = pattern.search(line)
+              if not match:
+                  out.append(line)
+                  continue
+
+              body = match.group(1)
+              terminator = match.group(2)
+              # Escape any literal double quotes before switching delimiters.
+              body = body.replace('\\"', '"').replace('"', '\\"')
+              replacement = f'body:"{body}"{terminator}'
+              line = line[:match.start()] + replacement + line[match.end():]
+              changed = True
+              out.append(line)
+
+          new_text = ''.join(out)
+          if changed:
+              path.write_text(new_text, encoding='utf-8')
+          else:
+              print('No single-quoted body values remain to convert.')
           PY
 
-      - name: Verify the fixed syntax
+      - name: Verify no single-quoted body values remain
         run: |
-          grep -n "4. Synthetic index risk\|6. MAM and PAMM risk" app/legal/'[slug]'/page.tsx
-          test "$(grep -n "4. Synthetic index risk" app/legal/'[slug]'/page.tsx | grep -c 'body:\"')" -eq 1
-          test "$(grep -n "6. MAM and PAMM risk" app/legal/'[slug]'/page.tsx | grep -c 'body:\"')" -eq 1
+          if grep -nE "body:'" app/legal/'[slug]'/page.tsx; then
+            echo "ERROR: A single-quoted body value remains."
+            exit 1
+          fi
+          echo "All legal body values use double quotes."
 
       - name: Commit and push
         run: |
@@ -61,5 +73,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add app/legal/'[slug]'/page.tsx
-          git commit -m "Fix legal risk disclosure quote syntax"
+          git commit -m "Convert all legal body strings to double quotes"
           git push
