@@ -7,45 +7,17 @@ export const ADMIN_ROLES: Record<AdminRole, { label: string; description: string
   copywriter: { label: 'Copywriter', description: 'Blog, education, FAQ, announcements and publishing workflows.' },
 };
 
-export type AdminNavGroup = {
-  label: string;
-  href?: string;
-  icon: string;
-  children?: Array<{ label: string; href: string }>;
-};
+export type AdminNavGroup = { label: string; href?: string; icon: string; children?: Array<{ label: string; href: string }>; };
 
 const fullNavigation: AdminNavGroup[] = [
   { label: 'Dashboard', href: '/admin', icon: 'layout-dashboard' },
-  { label: 'Customers', icon: 'users', children: [
-    { label: 'All Customers', href: '/admin/customers' }, { label: 'KYC', href: '/admin/customers/kyc' },
-    { label: 'Suspended', href: '/admin/customers/suspended' }, { label: 'Customer Activity', href: '/admin/customers/activity' },
-  ]},
-  { label: 'Services', icon: 'briefcase-business', children: [
-    { label: 'Copy Trading', href: '/admin/services/copy-trading' }, { label: 'MAM', href: '/admin/services/mam' },
-    { label: 'PAMM', href: '/admin/services/pamm' }, { label: 'ServerLess', href: '/admin/services/serverless' },
-    { label: 'Prop Firm A.T', href: '/admin/services/prop-firm-at' }, { label: 'TradingView', href: '/admin/services/tradingview' },
-  ]},
-  { label: 'Trading', icon: 'chart-no-axes-combined', children: [
-    { label: 'Broker Accounts', href: '/admin/trading/broker-accounts' }, { label: 'Performance', href: '/admin/trading/performance' },
-    { label: 'Risk Analysis', href: '/admin/trading/risk' }, { label: 'Investor Credentials', href: '/admin/trading/investor-credentials' },
-    { label: 'Myfxbook', href: '/admin/trading/myfxbook' },
-  ]},
-  { label: 'Subscriptions', icon: 'credit-card', children: [
-    { label: 'Active', href: '/admin/subscriptions/active' }, { label: 'Trials', href: '/admin/subscriptions/trials' },
-    { label: 'Expired', href: '/admin/subscriptions/expired' }, { label: 'Cancelled', href: '/admin/subscriptions/cancelled' },
-  ]},
-  { label: 'Finance', icon: 'wallet-cards', children: [
-    { label: 'Transactions', href: '/admin/finance/transactions' }, { label: 'Revenue', href: '/admin/finance/revenue' },
-    { label: 'Refunds', href: '/admin/finance/refunds' }, { label: 'Chargebacks', href: '/admin/finance/chargebacks' },
-  ]},
-  { label: 'Content', icon: 'file-pen-line', children: [
-    { label: 'Blog', href: '/admin/content/blog' }, { label: 'Education', href: '/admin/content/education' },
-    { label: 'FAQ', href: '/admin/content/faq' }, { label: 'Announcements', href: '/admin/content/announcements' },
-  ]},
-  { label: 'Support', icon: 'headphones', children: [
-    { label: 'Tickets', href: '/admin/support/tickets' }, { label: 'Complaints', href: '/admin/support/complaints' },
-    { label: 'Escalations', href: '/admin/support/escalations' },
-  ]},
+  { label: 'Customers', icon: 'users', children: [{ label: 'All Customers', href: '/admin/customers' }, { label: 'KYC', href: '/admin/customers/kyc' }, { label: 'Suspended', href: '/admin/customers/suspended' }, { label: 'Customer Activity', href: '/admin/customers/activity' }] },
+  { label: 'Services', icon: 'briefcase-business', children: [{ label: 'Copy Trading', href: '/admin/services/copy-trading' }, { label: 'MAM', href: '/admin/services/mam' }, { label: 'PAMM', href: '/admin/services/pamm' }, { label: 'ServerLess', href: '/admin/services/serverless' }, { label: 'Prop Firm A.T', href: '/admin/services/prop-firm-at' }, { label: 'TradingView', href: '/admin/services/tradingview' }] },
+  { label: 'Trading', icon: 'chart-no-axes-combined', children: [{ label: 'Broker Accounts', href: '/admin/trading/broker-accounts' }, { label: 'Performance', href: '/admin/trading/performance' }, { label: 'Risk Analysis', href: '/admin/trading/risk' }, { label: 'Investor Credentials', href: '/admin/trading/investor-credentials' }, { label: 'Myfxbook', href: '/admin/trading/myfxbook' }] },
+  { label: 'Subscriptions', icon: 'credit-card', children: [{ label: 'Active', href: '/admin/subscriptions/active' }, { label: 'Trials', href: '/admin/subscriptions/trials' }, { label: 'Expired', href: '/admin/subscriptions/expired' }, { label: 'Cancelled', href: '/admin/subscriptions/cancelled' }] },
+  { label: 'Finance', icon: 'wallet-cards', children: [{ label: 'Transactions', href: '/admin/finance/transactions' }, { label: 'Revenue', href: '/admin/finance/revenue' }, { label: 'Refunds', href: '/admin/finance/refunds' }, { label: 'Chargebacks', href: '/admin/finance/chargebacks' }] },
+  { label: 'Content', icon: 'file-pen-line', children: [{ label: 'Blog', href: '/admin/content/blog' }, { label: 'Education', href: '/admin/content/education' }, { label: 'FAQ', href: '/admin/content/faq' }, { label: 'Announcements', href: '/admin/content/announcements' }] },
+  { label: 'Support', icon: 'headphones', children: [{ label: 'Tickets', href: '/admin/support/tickets' }, { label: 'Complaints', href: '/admin/support/complaints' }, { label: 'Escalations', href: '/admin/support/escalations' }] },
   { label: 'Staff & Permissions', href: '/admin/staff', icon: 'user-cog' },
   { label: 'Reports', href: '/admin/reports', icon: 'file-bar-chart' },
   { label: 'Audit Logs', href: '/admin/audit-logs', icon: 'scroll-text' },
@@ -55,9 +27,13 @@ const fullNavigation: AdminNavGroup[] = [
 export const ADMIN_NAVIGATION: Record<AdminRole, AdminNavGroup[]> = {
   admin: fullNavigation,
   customer_support: [
-    { label: 'Dashboard', href: '/admin', icon: 'layout-dashboard' },
-    { label: 'Customers', icon: 'users', children: [{ label: 'All Customers', href: '/admin/customers' }, { label: 'KYC', href: '/admin/customers/kyc' }, { label: 'Customer Activity', href: '/admin/customers/activity' }] },
-    { label: 'Support', icon: 'headphones', children: [{ label: 'Tickets', href: '/admin/support/tickets' }, { label: 'Complaints', href: '/admin/support/complaints' }, { label: 'Escalations', href: '/admin/support/escalations' }] },
+    { label: 'Dashboard', href: '/admin/support', icon: 'layout-dashboard' },
+    { label: 'Customers', icon: 'users', children: [{ label: 'Search Customer', href: '/admin/customers' }, { label: 'Onboarding', href: '/admin/customers/onboarding' }, { label: 'Service Status', href: '/admin/customers/service-status' }] },
+    { label: 'Tickets', icon: 'headphones', children: [{ label: 'All Tickets', href: '/admin/support/tickets' }, { label: 'My Tickets', href: '/admin/support/tickets?view=my' }, { label: 'Unassigned', href: '/admin/support/tickets?view=unassigned' }, { label: 'Urgent', href: '/admin/support/tickets?view=urgent' }, { label: 'Resolved', href: '/admin/support/tickets?view=resolved' }] },
+    { label: 'Complaints', href: '/admin/support/complaints', icon: 'message-square-warning' },
+    { label: 'Knowledge Base', href: '/admin/content/faq', icon: 'book-open' },
+    { label: 'Announcements', href: '/admin/content/announcements', icon: 'megaphone' },
+    { label: 'Reports', href: '/admin/reports', icon: 'file-bar-chart' },
   ],
   financial_analyst: [
     { label: 'Dashboard', href: '/admin', icon: 'layout-dashboard' },
@@ -73,7 +49,7 @@ export const ADMIN_NAVIGATION: Record<AdminRole, AdminNavGroup[]> = {
 
 export const ROLE_SECURITY_RULES = {
   admin: ['full_platform_control', 'manage_staff', 'view_audit_logs', 'manage_settings', 'manage_customers', 'manage_services', 'manage_trading', 'manage_subscriptions', 'manage_finance', 'manage_content', 'manage_support'],
-  customer_support: ['customer_lookup', 'support_operations', 'onboarding', 'complaints', 'limited_kyc_view'],
+  customer_support: ['customer_lookup', 'customer_profile_view', 'subscription_view', 'service_view', 'limited_kyc_view', 'onboarding_view', 'ticket_create', 'ticket_assign', 'ticket_priority', 'ticket_status', 'ticket_reply', 'ticket_internal_notes', 'ticket_escalate', 'complaints', 'knowledge_base', 'announcements_view', 'support_reports'],
   financial_analyst: ['performance_reporting', 'risk_reporting', 'broker_reporting', 'financial_reporting'],
   copywriter: ['content_create', 'content_edit', 'content_publish', 'media_manage'],
 } as const;
