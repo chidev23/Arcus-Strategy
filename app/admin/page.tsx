@@ -2,100 +2,62 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
-import { ArrowRight, Activity, AlertTriangle, CheckCircle2, Clock3, DollarSign, FileCheck2, Headphones, ShieldCheck, Users } from 'lucide-react';
-import { ADMIN_NAVIGATION, ADMIN_ROLES, AdminRole } from '../../lib/admin-rbac';
+import { Activity, AlertTriangle, ArrowRight, BarChart3, Bell, CheckCircle2, Clock3, CreditCard, DollarSign, FileCheck2, Headphones, Landmark, ShieldAlert, Users, WalletCards } from 'lucide-react';
+import { ADMIN_ROLES, AdminRole } from '../../lib/admin-rbac';
 
-const metrics = [
-  { label: 'Customers', value: '—', note: 'Live Firebase count', icon: Users },
-  { label: 'KYC pending', value: '—', note: 'Requires review', icon: FileCheck2 },
-  { label: 'Active subscriptions', value: '—', note: 'Live billing count', icon: Activity },
-  { label: 'Open support', value: '—', note: 'Unresolved tickets', icon: Headphones },
+const roleFromQuery = (value: string | null): AdminRole => value === 'customer_support' || value === 'financial_analyst' || value === 'copywriter' ? value : 'admin';
+
+const statCards = [
+  ['Total Customers', '12,483', '+8.4% this month', Users, 'text-[#087f3f]', '/admin/customers'],
+  ['Active Subscriptions', '3,842', '+4.7% this month', CreditCard, 'text-[#087f3f]', '/admin/subscriptions/active'],
+  ['Monthly Revenue', '$XXX,XXX', 'Current reporting period', DollarSign, 'text-[#087f3f]', '/admin/reports/financial'],
+  ['Open Support Tickets', '126', '18 high priority', Headphones, 'text-[#b54708]', '/admin/support'],
+  ['KYC Pending', '84', '12 high priority', FileCheck2, 'text-[#b54708]', '/admin/kyc'],
+  ['Active Trading Accounts', '1,284', 'Across supported services', Activity, 'text-[#087f3f]', '/admin/broker-accounts'],
 ];
 
-const adminQueue = [
-  ['KYC reviews', 'Review submitted customer verification records.', '/admin/kyc', 'Review queue'],
-  ['Support tickets', 'Monitor unresolved customer requests and escalations.', '/admin/support', 'Open support'],
-  ['Subscription operations', 'Review service subscription status and payment state.', '/admin/subscriptions', 'Manage subscriptions'],
-  ['Audit activity', 'Review sensitive operational actions and access events.', '/admin/audit-logs', 'Open audit logs'],
-];
+const revenue = [72, 78, 69, 83, 88, 91, 86, 96, 102, 98, 109, 116];
+const customers = [610, 720, 680, 810, 930, 870, 1040, 990, 1120, 1180, 1260, 1340];
+const services = [['Copy Trading', '48%'], ['MAM', '17%'], ['PAMM', '13%'], ['ServerLess', '9%'], ['Prop Firm A.T', '7%'], ['TradingView', '6%']];
+const transactions = [['TX-84921', 'Customer subscription', '$450.00', 'Paystack', 'Completed'], ['TX-84920', 'Annual service renewal', '$1,200.00', 'PayPal', 'Completed'], ['TX-84919', 'Prop Firm subscription', '$300.00', 'Crypto', 'Pending'], ['TX-84918', 'Subscription renewal', '$450.00', 'Paystack', 'Failed']];
+const registrations = [['New customer', 'Customer registration', '2 min ago', 'Review'], ['KYC submission', 'Verification submitted', '18 min ago', 'Review'], ['New subscription', 'Copy Trading · MT5', '41 min ago', 'Open'], ['Account onboarding', 'ServerLess Algotrading', '1 hr ago', 'Open']];
 
-const roleFromQuery = (value: string | null): AdminRole => {
-  if (value === 'customer_support' || value === 'financial_analyst' || value === 'copywriter') return value;
-  return 'admin';
-};
+function MiniBars({ values, label }: { values: number[]; label: string }) {
+  const max = Math.max(...values);
+  return <div className="flex h-40 items-end gap-1.5 border-b border-l border-[#e5ebe7] px-3 pb-0 pt-5">{values.map((value, i) => <div key={`${label}-${i}`} className="group relative flex h-full flex-1 items-end"><div title={`${value}`} className="w-full rounded-t-md bg-[#087f3f]/80 transition group-hover:bg-[#065d2e]" style={{ height: `${(value / max) * 100}%` }} /></div>)}</div>;
+}
 
 export default function AdminPage() {
   const params = useSearchParams();
   const role = roleFromQuery(params.get('role'));
   const roleInfo = ADMIN_ROLES[role];
-  const navigation = ADMIN_NAVIGATION[role];
 
-  const roleCards = useMemo(() => {
-    if (role === 'customer_support') return [
-      ['Customer queue', 'Search and review customer records with limited operational access.', '/admin/customers', Users],
-      ['Onboarding', 'Track customers who still need service onboarding actions.', '/admin/onboarding', Clock3],
-      ['Complaints & escalations', 'Keep complaints visible and route sensitive cases appropriately.', '/admin/complaints', AlertTriangle],
-    ] as const;
-    if (role === 'financial_analyst') return [
-      ['Performance', 'Review service, broker and account performance reporting.', '/admin/performance', Activity],
-      ['Risk', 'Review drawdown, exposure and risk reporting.', '/admin/risk', ShieldCheck],
-      ['Financial reports', 'Prepare operational financial reporting without routine investor-password access.', '/admin/reports/financial', DollarSign],
-    ] as const;
-    if (role === 'copywriter') return [
-      ['Blog', 'Create, edit and prepare articles for publishing.', '/admin/content/blog', FileCheck2],
-      ['Education', 'Manage courses, articles, videos and documents.', '/admin/content/education', FileCheck2],
-      ['Publishing', 'Control content review and publication workflow.', '/admin/content/publishing', CheckCircle2],
-    ] as const;
-    return adminQueue.map(([title, text, href, cta]) => [title, text, href, cta, CheckCircle2] as const);
-  }, [role]);
+  return <main className="min-h-screen bg-[#f5f7f6]">
+    <header className="sticky top-0 z-20 border-b border-[#dfe6e2] bg-white/95 backdrop-blur">
+      <div className="flex min-h-[76px] items-center justify-between gap-4 px-5 sm:px-8 xl:px-10">
+        <div><p className="text-[8px] font-black uppercase tracking-[.22em] text-[#087f3f]">Arcus Strategy · Administration</p><h1 className="mt-1 text-xl font-black tracking-[-.025em]">Admin Dashboard</h1></div>
+        <div className="flex items-center gap-2"><span className="hidden rounded-full border border-[#dfe6e2] bg-[#f7f9f8] px-3 py-2 text-[9px] font-black uppercase tracking-[.1em] text-[#5e6964] sm:inline-flex">{roleInfo.label}</span><button className="grid h-9 w-9 place-items-center rounded-xl border border-[#dfe6e2] bg-white text-[#53605a]"><Bell size={15}/></button><div className="grid h-9 w-9 place-items-center rounded-xl bg-[#102019] text-[11px] font-black text-white">AD</div></div>
+      </div>
+    </header>
 
-  return (
-    <main>
-      <header className="border-b border-[#dfe6e2] bg-white">
-        <div className="flex min-h-[76px] items-center justify-between gap-5 px-5 sm:px-8 xl:px-10">
-          <div>
-            <p className="text-[9px] font-black uppercase tracking-[.2em] text-[#087f3f]">Arcus Strategy / Operations</p>
-            <h1 className="mt-1 text-xl font-black tracking-[-.025em]">{roleInfo.label} workspace</h1>
-          </div>
-          <div className="hidden items-center gap-3 sm:flex">
-            <span className="rounded-full border border-[#dfe6e2] bg-[#f7f9f8] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-[#65706b]">RBAC protected</span>
-            <span className="rounded-full bg-[#eaf7ef] px-3 py-2 text-[9px] font-black uppercase tracking-[.12em] text-[#087f3f]">Operations</span>
-          </div>
-        </div>
-      </header>
+    <section className="px-5 pb-4 pt-7 sm:px-8 xl:px-10"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-[9px] font-black uppercase tracking-[.17em] text-[#7b8580]">Executive operations overview</p><h2 className="mt-1 text-2xl font-black tracking-[-.035em]">Platform at a glance</h2><p className="mt-1 text-[11px] text-[#707a75]">Monitor customers, revenue, trading infrastructure, service delivery and administrative risk.</p></div><div className="flex gap-2"><Link href="/admin/reports" className="inline-flex items-center gap-2 rounded-xl border border-[#cfd9d3] bg-white px-4 py-2.5 text-[10px] font-black text-[#26332d]">Reports <ArrowRight size={13}/></Link><Link href="/admin/audit-logs" className="inline-flex items-center gap-2 rounded-xl bg-[#087f3f] px-4 py-2.5 text-[10px] font-black text-white">Audit logs <ArrowRight size={13}/></Link></div></div></section>
 
-      <section className="border-b border-[#e1e7e3] bg-white px-5 py-8 sm:px-8 xl:px-10">
-        <div className="max-w-4xl">
-          <p className="text-[9px] font-black uppercase tracking-[.18em] text-[#7b8580]">Phase 2 · Role-based control center</p>
-          <h2 className="mt-2 text-3xl font-black tracking-[-.045em] sm:text-4xl">Operational command for Arcus Strategy.</h2>
-          <p className="mt-3 max-w-3xl text-[13px] leading-6 text-[#68726e]">{roleInfo.description} This dashboard is structured around least-privilege access, operational queues, sensitive-data separation and auditable actions.</p>
-        </div>
-      </section>
+    <section className="grid gap-3 px-5 py-4 sm:grid-cols-2 sm:px-8 xl:grid-cols-3 xl:px-10">{statCards.map(([label,value,note,Icon,iconColor,href]) => <Link href={href as string} key={label as string} className="group rounded-2xl border border-[#dfe6e2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,20,.03)] transition hover:-translate-y-0.5 hover:shadow-md"><div className="flex items-start justify-between"><span className="text-[9px] font-black uppercase tracking-[.12em] text-[#7b8580]">{label as string}</span><Icon size={17} className={iconColor as string}/></div><div className="mt-3 flex items-end justify-between gap-3"><strong className="text-2xl font-black tracking-[-.04em]">{value as string}</strong><span className="text-right text-[9px] font-bold text-[#7b8580]">{note as string}</span></div></Link>)}</section>
 
-      <section className="px-5 py-7 sm:px-8 xl:px-10">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {metrics.map(({ label, value, note, icon: Icon }) => <div key={label} className="rounded-2xl border border-[#dfe6e2] bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><span className="text-[9px] font-black uppercase tracking-[.14em] text-[#7c8782]">{label}</span><Icon size={17} className="text-[#087f3f]"/></div><strong className="mt-3 block text-2xl font-black">{value}</strong><p className="mt-1 text-[10px] text-[#7c8782]">{note}</p></div>)}
-        </div>
-      </section>
+    <section className="grid gap-5 px-5 py-4 sm:px-8 xl:grid-cols-[1.5fr_.75fr] xl:px-10">
+      <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><div className="flex items-end justify-between"><div><p className="text-[8px] font-black uppercase tracking-[.18em] text-[#087f3f]">Financial performance</p><h3 className="mt-1 text-base font-black">Revenue</h3></div><select className="rounded-lg border border-[#dfe6e2] bg-white px-2.5 py-2 text-[9px] font-bold text-[#5f6965]"><option>Last 12 months</option><option>Last 30 days</option><option>Last 7 days</option></select></div><div className="mt-5"><MiniBars values={revenue} label="revenue"/><div className="mt-2 flex justify-between text-[8px] font-bold text-[#89928e]"><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span></div></div></div>
+      <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><p className="text-[8px] font-black uppercase tracking-[.18em] text-[#087f3f]">Customer acquisition</p><h3 className="mt-1 text-base font-black">New customers</h3><div className="mt-5"><MiniBars values={customers} label="customers"/></div><div className="mt-3 flex items-center justify-between"><span className="text-[9px] text-[#7b8580]">Current month</span><strong className="text-sm font-black">1,340</strong></div></div>
+    </section>
 
-      <section className="grid gap-5 px-5 pb-10 sm:px-8 xl:grid-cols-[1.35fr_.65fr] xl:px-10">
-        <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6 shadow-sm">
-          <div className="flex items-end justify-between gap-4 border-b border-[#e8ecea] pb-5"><div><p className="text-[9px] font-black uppercase tracking-[.17em] text-[#087f3f]">Work queues</p><h3 className="mt-1 text-lg font-black">Priority operations</h3></div><span className="text-[9px] font-bold text-[#7c8782]">Live data connects in the backend phase</span></div>
-          <div className="divide-y divide-[#edf0ee]">{roleCards.map((item: any) => { const [title, text, href, cta, Icon = CheckCircle2] = item; return <div key={title} className="flex items-center justify-between gap-5 py-5"><div className="flex min-w-0 items-start gap-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#f1f6f3] text-[#087f3f]"><Icon size={16}/></span><div><h4 className="text-[12px] font-black">{title}</h4><p className="mt-1 max-w-xl text-[10px] leading-5 text-[#707a75]">{text}</p></div></div><Link href={href} className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#cdd8d2] px-3 py-2 text-[9px] font-black text-[#087f3f] hover:bg-[#f1f6f3]">{cta || 'Open'} <ArrowRight size={12}/></Link></div>})}</div>
-        </div>
+    <section className="grid gap-5 px-5 py-4 sm:px-8 xl:grid-cols-2 xl:px-10">
+      <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><div className="flex items-end justify-between"><div><p className="text-[8px] font-black uppercase tracking-[.18em] text-[#087f3f]">Subscriptions</p><h3 className="mt-1 text-base font-black">Subscription activity</h3></div><Link href="/admin/subscriptions" className="text-[9px] font-black text-[#087f3f]">View all</Link></div><div className="mt-5 grid grid-cols-3 gap-3"><div className="rounded-xl bg-[#f1f6f3] p-4"><span className="text-[8px] font-black uppercase tracking-[.12em] text-[#718079]">Active</span><strong className="mt-2 block text-xl font-black">3,842</strong></div><div className="rounded-xl bg-[#f8f5ed] p-4"><span className="text-[8px] font-black uppercase tracking-[.12em] text-[#8a8069]">Trials</span><strong className="mt-2 block text-xl font-black">416</strong></div><div className="rounded-xl bg-[#f7f1f1] p-4"><span className="text-[8px] font-black uppercase tracking-[.12em] text-[#8a6d6d]">Expired</span><strong className="mt-2 block text-xl font-black">193</strong></div></div><div className="mt-5 space-y-3"><div className="flex items-center justify-between text-[9px]"><span className="font-bold text-[#6d7772]">Renewals due</span><strong>74</strong></div><div className="h-1.5 rounded-full bg-[#edf1ef]"><div className="h-full w-[64%] rounded-full bg-[#087f3f]"/></div><div className="flex items-center justify-between text-[9px]"><span className="font-bold text-[#6d7772]">Failed payment follow-up</span><strong>18</strong></div><div className="h-1.5 rounded-full bg-[#edf1ef]"><div className="h-full w-[28%] rounded-full bg-[#b54708]"/></div></div></div>
+      <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><p className="text-[8px] font-black uppercase tracking-[.18em] text-[#087f3f]">Service mix</p><h3 className="mt-1 text-base font-black">Service distribution</h3><div className="mt-5 space-y-3">{services.map(([name,percent]) => <div key={name}><div className="flex justify-between text-[9px]"><span className="font-bold">{name}</span><strong>{percent}</strong></div><div className="mt-1.5 h-2 rounded-full bg-[#edf1ef]"><div className="h-full rounded-full bg-[#087f3f]" style={{width: percent}}/></div></div>)}</div></div>
+    </section>
 
-        <div className="rounded-2xl border border-[#18231e] bg-[#101714] p-6 text-white shadow-sm">
-          <p className="text-[9px] font-black uppercase tracking-[.18em] text-[#65d995]">Security boundary</p>
-          <h3 className="mt-2 text-lg font-black">Least privilege by role.</h3>
-          <div className="mt-6 space-y-3 text-[10px] leading-5 text-[#b5c0ba]">
-            <div className="rounded-xl border border-white/10 bg-white/[.035] p-4"><strong className="block text-white">Administrator</strong>Full operational control, staff permissions, settings and audit access.</div>
-            <div className="rounded-xl border border-white/10 bg-white/[.035] p-4"><strong className="block text-white">Customer Support</strong>Customer and ticket operations with limited KYC/subscription visibility.</div>
-            <div className="rounded-xl border border-white/10 bg-white/[.035] p-4"><strong className="block text-white">Financial Analyst</strong>Performance, risk and financial reporting; plaintext investor passwords are not a normal permission.</div>
-            <div className="rounded-xl border border-white/10 bg-white/[.035] p-4"><strong className="block text-white">Copywriter</strong>Content creation, editing, media and publishing workflow.</div>
-          </div>
-        </div>
-      </section>
-    </main>
-  );
+    <section className="grid gap-5 px-5 py-4 pb-10 sm:px-8 xl:grid-cols-[1.25fr_1fr_.85fr] xl:px-10">
+      <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><div className="flex items-center justify-between"><h3 className="text-base font-black">Recent transactions</h3><Link href="/admin/payments" className="text-[9px] font-black text-[#087f3f]">View all</Link></div><div className="mt-4 overflow-x-auto"><table className="w-full text-left"><thead><tr className="border-b border-[#e8ecea] text-[8px] uppercase tracking-[.12em] text-[#88928d]"><th className="pb-3">Reference</th><th className="pb-3">Description</th><th className="pb-3">Amount</th><th className="pb-3">Status</th></tr></thead><tbody>{transactions.map(([id,desc,amount,method,status]) => <tr key={id} className="border-b border-[#f0f2f1] text-[9px]"><td className="py-3 font-black">{id}</td><td className="py-3"><span className="block font-bold">{desc}</span><span className="text-[8px] text-[#8a938f]">{method}</span></td><td className="py-3 font-black">{amount}</td><td className="py-3"><span className={`rounded-full px-2 py-1 text-[7px] font-black ${status === 'Completed' ? 'bg-[#eaf7ef] text-[#087f3f]' : status === 'Failed' ? 'bg-[#faeeee] text-[#a33b3b]' : 'bg-[#fff5df] text-[#986b16]'}`}>{status}</span></td></tr>)}</tbody></table></div></div>
+      <div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><div className="flex items-center justify-between"><h3 className="text-base font-black">Recent registrations</h3><Link href="/admin/customers" className="text-[9px] font-black text-[#087f3f]">View all</Link></div><div className="mt-3 divide-y divide-[#edf0ee]">{registrations.map(([title,detail,time,cta]) => <div key={title} className="flex items-center justify-between gap-3 py-3"><div><strong className="block text-[10px]">{title}</strong><span className="block text-[8px] text-[#7c8782]">{detail} · {time}</span></div><Link href="/admin/customers" className="text-[8px] font-black text-[#087f3f]">{cta}</Link></div>)}</div></div>
+      <div className="space-y-5"><div className="rounded-2xl border border-[#f0d7d7] bg-white p-6"><div className="flex items-center gap-2"><ShieldAlert size={16} className="text-[#b33a3a]"/><h3 className="text-base font-black">Critical alerts</h3></div><div className="mt-4 space-y-2.5"><div className="rounded-xl bg-[#fff4f4] p-3"><strong className="block text-[9px] text-[#9f3535]">12 KYC reviews overdue</strong><span className="text-[8px] text-[#806a6a]">Requires administrative attention.</span></div><div className="rounded-xl bg-[#fff8ec] p-3"><strong className="block text-[9px] text-[#98630e]">18 failed payments</strong><span className="text-[8px] text-[#806f55]">Follow-up queue requires review.</span></div></div></div><div className="rounded-2xl border border-[#dfe6e2] bg-white p-6"><div className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#087f3f]"/><h3 className="text-base font-black">Pending actions</h3></div><div className="mt-4 space-y-2.5 text-[9px]"><Link href="/admin/kyc" className="flex justify-between rounded-lg bg-[#f6f8f7] p-3 font-bold">KYC approvals <span>84 →</span></Link><Link href="/admin/support" className="flex justify-between rounded-lg bg-[#f6f8f7] p-3 font-bold">Escalated tickets <span>7 →</span></Link><Link href="/admin/refunds" className="flex justify-between rounded-lg bg-[#f6f8f7] p-3 font-bold">Refund requests <span>5 →</span></Link></div></div></div>
+    </section>
+  </main>;
 }
